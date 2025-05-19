@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "./node_modules/.prisma/client"
 }
 
 // Supabase에서 제공하는 PostgreSQL 데이터베이스 사용
