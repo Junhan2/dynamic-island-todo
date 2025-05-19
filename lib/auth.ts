@@ -10,12 +10,32 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      authorization: {
+        params: {
+          prompt: "select_account",
+          access_type: "offline",
+          response_type: "code"
+        }
+      },
     }),
   ],
+  debug: true, // 디버그 모드 활성화
+  logger: {
+    error: (code, metadata) => {
+      console.error(`Auth error: ${code}`, metadata);
+    },
+    warn: (code) => {
+      console.warn(`Auth warning: ${code}`);
+    },
+    debug: (code, metadata) => {
+      console.log(`Auth debug: ${code}`, metadata);
+    },
+  },
   callbacks: {
     async signIn({ user, account, profile }) {
       console.log('signIn callback', { user, account, profile });
       if (!user.email) {
+        console.error('User email is missing');
         return false;
       }
       
@@ -52,9 +72,20 @@ export const authOptions: NextAuthOptions = {
         }
       }
       
+      console.log('Sign-in successful, redirecting...');
       return true;
     },
+    async redirect({ url, baseUrl }) {
+      console.log('Redirect callback', { url, baseUrl });
+      // 기본 URL이 포함된 URL로만 리디렉션 허용
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      // 다른 도메인으로의 리디렉션은 기본 URL로 변경
+      return baseUrl;
+    },
     session: async ({ session, user }) => {
+      console.log('Session callback', { session, user });
       if (session?.user) {
         session.user.id = user.id;
       }

@@ -16,11 +16,14 @@ export default function SignIn() {
       setError(null);
       console.log('로그인 시도 중...');
       
-      // NextAuth의 signIn 함수 사용
+      // NextAuth의 signIn 함수에 명시적 파라미터 설정
       const result = await signIn('google', { 
         callbackUrl: '/',
-        redirect: true 
+        redirect: true,
+        prompt: 'select_account'
       });
+      
+      console.log('로그인 결과:', result);
       
       // 로그인 실패 시
       if (!result?.ok) {

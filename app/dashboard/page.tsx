@@ -12,12 +12,14 @@ import { Loading, ErrorState, EmptyState } from '@/components/ui/loading';
 import { useCurrentUser } from '@/hooks/use-current-user';
 import { useTodos } from '@/hooks/use-todos';
 import { useTeams } from '@/hooks/use-teams';
+import { useAuthDebug } from '@/hooks/useAuthDebug';
 import { format } from 'date-fns';
 import { ListTodo, Users } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoading: isLoadingUser } = useCurrentUser();
+  const { status: authStatus } = useAuthDebug(); // 인증 디버깅 훅 추가
   const [currentTeamId, setCurrentTeamId] = useState<string | null>(null);
   const [filters, setFilters] = useState<TodoFiltersType>({
     status: 'all',
