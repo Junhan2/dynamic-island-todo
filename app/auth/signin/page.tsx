@@ -8,75 +8,22 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // URL에서 에러 파라미터 가져오기
+  // URL 파라미터 처리
   const searchParams = useSearchParams();
   const errorType = searchParams.get('error');
-  const callbackUrl = searchParams.get('callbackUrl') || '/'; 
   
-  // URL 에러 파라미터 처리
+  // 오류 처리
   useEffect(() => {
     if (errorType) {
-      switch (errorType) {
-        case 'OAuthSignin':
-          setError('OAuth 로그인 과정을 시작하는 중 오류가 발생했습니다.');
-          break;
-        case 'OAuthCallback':
-          setError('OAuth 콜백 처리 중 오류가 발생했습니다.');
-          break;
-        case 'OAuthCreateAccount':
-          setError('OAuth 계정 생성 중 오류가 발생했습니다.');
-          break;
-        case 'EmailCreateAccount':
-          setError('이메일 계정 생성 중 오류가 발생했습니다.');
-          break;
-        case 'Callback':
-          setError('콜백 처리 중 오류가 발생했습니다.');
-          break;
-        case 'OAuthAccountNotLinked':
-          setError('이메일이 다른 계정에 이미 연결되어 있습니다.');
-          break;
-        case 'EmailSignin':
-          setError('이메일 로그인 중 오류가 발생했습니다.');
-          break;
-        case 'CredentialsSignin':
-          setError('자격 증명이 유효하지 않습니다.');
-          break;
-        case 'SessionRequired':
-          setError('이 페이지에 접근하려면 로그인이 필요합니다.');
-          break;
-        default:
-          setError('로그인 중 오류가 발생했습니다.');
-          break;
-      }
+      setError(`인증 오류가 발생했습니다: ${errorType}`);
     }
   }, [errorType]);
   
-  const handleSignIn = async () => {
-    try {
-      setLoading(true);
-      console.log('로그인 시도 중... 콜백 URL:', callbackUrl);
-      
-      const result = await signIn('google', { 
-        callbackUrl: callbackUrl,
-        redirect: false
-      });
-      
-      console.log('로그인 결과:', result);
-      
-      if (result?.error) {
-        console.error('로그인 실패:', result.error);
-        setError('로그인 중 오류가 발생했습니다: ' + result.error);
-        setLoading(false);
-      } else if (result?.url) {
-        // 로그인 성공 시 리디렉션
-        console.log('로그인 성공, 리디렉션 URL:', result.url);
-        window.location.href = result.url;
-      }
-    } catch (err) {
-      console.error('로그인 예외 발생:', err);
-      setError('로그인 중 예기치 않은 오류가 발생했습니다.');
-      setLoading(false);
-    }
+  // 단순화된 로그인 처리
+  const handleGoogleLogin = () => {
+    setLoading(true);
+    // 리디렉션 없이 바로 Google 로그인 페이지로 이동
+    window.location.href = "/api/auth/signin/google";
   };
 
   return (
@@ -95,7 +42,7 @@ export default function SignIn() {
         
         <button
           className="w-full flex items-center justify-center bg-white hover:bg-gray-200 text-black p-3 rounded-md"
-          onClick={handleSignIn}
+          onClick={handleGoogleLogin}
           disabled={loading}
         >
           {loading ? (
@@ -128,10 +75,11 @@ export default function SignIn() {
           )}
         </button>
         
-        <div className="text-xs text-gray-500 mt-4">
-          <p>디버그 정보: 현재 리디렉션 URL: {callbackUrl}</p>
-          {errorType && <p>오류 유형: {errorType}</p>}
-        </div>
+        {errorType && (
+          <div className="mt-4 text-xs text-gray-500">
+            <p>오류 정보: {errorType}</p>
+          </div>
+        )}
       </div>
     </div>
   );

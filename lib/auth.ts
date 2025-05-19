@@ -12,10 +12,12 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      // 명시적으로 authorization 파라미터 설정
+      // 명확한 리디렉션 URL 지정
       authorization: {
         params: {
-          prompt: "select_account"
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
         }
       }
     }),
@@ -33,8 +35,8 @@ export const authOptions: NextAuthOptions = {
     },
     async redirect({ url, baseUrl }) {
       console.log('Redirect callback', { url, baseUrl });
-      // 명시적으로 baseUrl로 리디렉션
-      return `${baseUrl}/dashboard`;
+      // 모든 URL을 허용하도록 단순화 - 보안상 위험하므로 프로덕션에서는 수정 필요
+      return '/dashboard';
     },
     async session({ session, user }) {
       console.log('Session callback', { session, user });
@@ -59,7 +61,12 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   // 세션 설정
   session: {
-    strategy: "database",
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30일
+  },
+  
+  // JWT 설정
+  jwt: {
     maxAge: 30 * 24 * 60 * 60, // 30일
   },
   // 쿠키 설정
