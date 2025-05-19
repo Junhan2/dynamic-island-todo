@@ -16,8 +16,18 @@ export default function SignIn() {
       setError(null);
       console.log('로그인 시도 중...');
       
-      // 직접 URL로 이동하는 방식 사용
-      window.location.href = `/api/auth/signin/google?callbackUrl=${encodeURIComponent('/')}`;
+      // NextAuth의 signIn 함수 사용
+      const result = await signIn('google', { 
+        callbackUrl: '/',
+        redirect: true 
+      });
+      
+      // 로그인 실패 시
+      if (!result?.ok) {
+        console.error('로그인 실패:', result);
+        setError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        setLoading(false);
+      }
     } catch (err) {
       console.error('로그인 에러:', err);
       setError('로그인 중 오류가 발생했습니다.');
