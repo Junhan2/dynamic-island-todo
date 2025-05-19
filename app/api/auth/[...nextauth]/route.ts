@@ -1,21 +1,10 @@
 import NextAuth from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
+import { authOptions } from '@/lib/auth';
 
 /**
- * 가장 기본적인 NextAuth 설정 - 복잡한 설정 없이 순수하게 Google 로그인만 구현
+ * 공식 NextAuth.js v5 API Route
+ * authOptions는 lib/auth.ts에서 가져옴
  */
-const handler = NextAuth({
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    }),
-  ],
-  debug: true,
-  pages: {
-    signIn: '/auth/signin',
-    error: '/auth/error',
-  },
-});
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

@@ -35,8 +35,14 @@ export const authOptions: NextAuthOptions = {
     },
     async redirect({ url, baseUrl }) {
       console.log('Redirect callback', { url, baseUrl });
-      // 모든 URL을 허용하도록 단순화 - 보안상 위험하므로 프로덕션에서는 수정 필요
-      return '/dashboard';
+      // 절대 URL인 경우 유효한 리디렉션인지 확인
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      } else if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      // 기본적으로 루트 페이지로 리디렉션
+      return baseUrl;
     },
     async session({ session, user }) {
       console.log('Session callback', { session, user });
