@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { AssignMembers } from '@/components/ui/assign-members';
 
 export interface TodoItemProps {
   id: string | number;
@@ -22,7 +23,7 @@ export interface TodoItemProps {
   teamMembers?: TeamMemberType[];
   onToggle: (id: string | number) => void;
   onDelete: (id: string | number) => void;
-  onAssign: (id: string | number) => void;
+  onAssign: (id: string | number, memberIds?: string[]) => void;
   currentUserId: string;
 }
 
@@ -193,15 +194,24 @@ export function TodoItem({
           isHovered ? "opacity-100" : "opacity-0"
         )}
       >
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-7 w-7 text-gray-500 hover:text-yellow-500 hover:bg-[#222222]"
-          onClick={() => onAssign(id)}
-          aria-label="Assign to team members"
-        >
-          <Share2 className="h-4 w-4" />
-        </Button>
+        <AssignMembers
+          todoId={id}
+          todoText={text}
+          teamMembers={teamMembers}
+          currentUserId={currentUserId}
+          assignedMemberIds={assignedTo}
+          onAssign={onAssign}
+          trigger={
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7 text-gray-500 hover:text-yellow-500 hover:bg-[#222222]"
+              aria-label="Assign to team members"
+            >
+              <Share2 className="h-4 w-4" />
+            </Button>
+          }
+        />
         <Button
           size="icon"
           variant="ghost"

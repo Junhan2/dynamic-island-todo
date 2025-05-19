@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import { todoService } from '@/lib/services/supabase-service';
 
 interface RouteSegment {
   params: {
@@ -46,12 +47,12 @@ export async function POST(request: Request, { params }: RouteSegment) {
     const body = await request.json();
     const { userIds } = body;
     
-    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+    if (!userIds || !Array.isArray(userIds)) {
       return NextResponse.json({ error: '할당할 사용자 ID 목록이 필요합니다' }, { status: 400 });
     }
     
     // 팀 ID가 있는 경우 모든 사용자가 팀 멤버인지 확인
-    if (todo.teamId) {
+    if (todo.teamId && userIds.length > 0) {
       const teamMembers = todo.team!.members.map(member => member.userId);
       const nonTeamMembers = userIds.filter(userId => !teamMembers.includes(userId));
       
@@ -63,41 +64,12 @@ export async function POST(request: Request, { params }: RouteSegment) {
       }
     }
     
-    // 트랜잭션을 사용하여 할 일 할당 처리
-    await prisma.$transaction(async (tx) => {
-      // 기존 할당 정보 삭제
-      await tx.todoAssignment.deleteMany({
-        where: { todoId },
-      });
-      
-      // 새 할당 정보 생성
-      const assignments = userIds.map((userId: string) => ({
-        todoId,
-        userId,
-      }));
-      
-      await tx.todoAssignment.createMany({
-        data: assignments,
-      });
-    });
+    // Supabase 서비스를 사용하여 할 일 할당 처리
+    const updatedTodo = await todoService.assignTodo(todoId, userIds);
     
-    // 업데이트된 할 일 정보 조회
-    const updatedTodo = await prisma.todo.findUnique({
-      where: { id: todoId },
-      include: {
-        assignedTo: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    if (!updatedTodo) {
+      return NextResponse.json({ error: '할 일 할당 중 오류가 발생했습니다' }, { status: 500 });
+    }
     
     return NextResponse.json(updatedTodo);
   } catch (error) {

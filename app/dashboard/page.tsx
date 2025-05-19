@@ -174,18 +174,22 @@ export default function DashboardPage() {
   };
   
   // 할 일 할당 처리
-  const handleAssignTodo = async (id: string | number) => {
+  const handleAssignTodo = async (id: string | number, memberIds?: string[]) => {
     const todo = todos.find(t => t.id === id);
     if (!todo) return;
     
-    // 여기서는 간단하게 처리하지만, 실제로는 담당자 선택 UI를 표시해야 함
-    // 현재는 기존 담당자에 현재 사용자만 토글
-    const currentAssignees = todo.assignedTo || [];
-    const newAssignees = currentAssignees.includes(user?.id || '')
-      ? currentAssignees.filter(assigneeId => assigneeId !== user?.id)
-      : [...currentAssignees, user?.id || ''];
-    
-    await assignTodo(id.toString(), newAssignees);
+    if (memberIds) {
+      // 멤버 선택 UI에서 선택한 멤버 목록으로 할당
+      await assignTodo(id.toString(), memberIds);
+    } else {
+      // 기존 방식: 클릭 시 현재 사용자만 토글
+      const currentAssignees = todo.assignedTo || [];
+      const newAssignees = currentAssignees.includes(user?.id || '')
+        ? currentAssignees.filter(assigneeId => assigneeId !== user?.id)
+        : [...currentAssignees, user?.id || ''];
+      
+      await assignTodo(id.toString(), newAssignees);
+    }
   };
   
   // 로딩 중이면 로딩 상태 표시

@@ -221,5 +221,51 @@ export const todoService = {
     }
     
     return true;
+  },
+  
+  /**
+   * 할 일 할당
+   */
+  async assignTodo(todoId: string, userIds: string[]) {
+    // 먼저 기존 할당 정보 삭제
+    await supabase
+      .from('TodoAssignment')
+      .delete()
+      .eq('todoId', todoId);
+    
+    // 새로운 할당 정보 추가
+    if (userIds.length > 0) {
+      const assignments = userIds.map(userId => ({
+        todoId,
+        userId
+      }));
+      
+      const { error } = await supabase
+        .from('TodoAssignment')
+        .insert(assignments);
+      
+      if (error) {
+        console.error('Error assigning todo:', error);
+        return null;
+      }
+    }
+    
+    // 업데이트된 할 일 정보 반환
+    const { data, error } = await supabase
+      .from('Todo')
+      .select(`
+        *,
+        assignedTo: TodoAssignment(userId),
+        createdBy: User!createdById(id, name, image)
+      `)
+      .eq('id', todoId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching updated todo:', error);
+      return null;
+    }
+    
+    return data;
   }
 };
