@@ -1,0 +1,90 @@
+/* 모바일 최적화 스타일 */
+
+@media (max-width: 640px) {
+  /* Dynamic Island 너비 조정 */
+  :root {
+    --di-expanded-width: 95vw;
+    --di-collapsed-width: 85vw;
+  }
+
+  /* 필터 및 정렬 버튼 크기 조정 */
+  .filter-buttons-container {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* 할 일 아이템 모바일 최적화 */
+  .todo-item-mobile {
+    padding: 12px;
+  }
+
+  /* 모바일에서 할 일 입력 폼 최적화 */
+  .todo-form-mobile {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .todo-form-mobile .actions {
+    flex-direction: row;
+    width: 100%;
+  }
+  
+  /* 팀 선택 드롭다운 모바일 최적화 */
+  .team-selector-mobile {
+    width: 100%;
+  }
+  
+  /* 모바일에서 탭 크기 조정 */
+  .tabs-mobile {
+    width: 100%;
+  }
+  
+  .tabs-mobile [role="tablist"] {
+    width: 100%;
+  }
+  
+  .tabs-mobile [role="tab"] {
+    flex: 1;
+  }
+}
+
+/* 태블릿 최적화 스타일 */
+@media (min-width: 641px) and (max-width: 1024px) {
+  :root {
+    --di-expanded-width: 80vw;
+    --di-collapsed-width: 300px;
+  }
+}
+
+/* 애니메이션 최적화 */
+.di-transition {
+  transition: all 0.25s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* 다크 테마 최적화 */
+.dark-theme {
+  --background: #000000;
+  --card-background: #111111;
+  --border-color: #222222;
+  --hover-color: #333333;
+  --text-color: #eeeeee;
+  --text-muted: #888888;
+  --accent-color: #f7df1e;
+  --completed-color: #10b981;
+  --overdue-color: #ef4444;
+  --today-color: #3b82f6;
+}
+
+/* 접근성 개선 */
+.focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* 터치 최적화 */
+@media (pointer: coarse) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
